@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
+#SIMPLE LINEAR REGRESSION
+
 #read csv file
 df = pd.read_csv("FuelConsumption.csv")
 #select some columns only
@@ -61,3 +63,29 @@ print("Mean absolute error: %.2f" % np.mean(np.absolute(predicted_y - test_y))) 
 print("Residual sum of squares (MSE): %.2f" % np.mean((predicted_y - test_y) ** 2))
 print("R2-score: %.2f" % r2_score(test_y , predicted_y) )
 
+
+#MULTIPLE LINEAR REGRESSION
+
+#we take some feature that we will use for regression
+cdf = df[['ENGINESIZE','CYLINDERS','FUELCONSUMPTION_CITY','FUELCONSUMPTION_HWY','FUELCONSUMPTION_COMB','CO2EMISSIONS']]
+#we create test and training sets
+msk = np.random.rand(len(df)) < 0.8
+train = cdf[msk]
+test = cdf[~msk]
+
+#multiple linear regression model: An example of multiple linear regression is predicting co2emission using the features 
+#FUELCONSUMPTION_COMB, EngineSize and Cylinders of cars
+regr = linear_model.LinearRegression()
+train_x = np.asanyarray(train[['ENGINESIZE','CYLINDERS','FUELCONSUMPTION_COMB']])
+train_y = np.asanyarray(train[['CO2EMISSIONS']])
+regr.fit (train_x, train_y)
+# The coefficients
+print ('Coefficients: ', regr.coef_)
+
+#prediction using the test set
+y_predicted= regr.predict(test[['ENGINESIZE','CYLINDERS','FUELCONSUMPTION_COMB']])
+test_x = np.asanyarray(test[['ENGINESIZE','CYLINDERS','FUELCONSUMPTION_COMB']])
+test_y = np.asanyarray(test[['CO2EMISSIONS']])
+print("Mean Squared Error (MSE) : %.2f" % np.mean((y_predicted - test_y) ** 2))
+# Explained variance score: 1 is perfect prediction
+print('Variance score: %.2f' % regr.score(test_x, test_y))
